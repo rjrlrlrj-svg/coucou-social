@@ -1,0 +1,7 @@
+{
+  "name": "CouCou - 凑凑社交平台",
+  "description": "一个专注于线下活动组织的社交平台，让用户可以轻松发起或加入羽毛球、拼团、剧本杀等多样化活动。支持AI智能润色活动描述，让你的活动更具吸引力。",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
