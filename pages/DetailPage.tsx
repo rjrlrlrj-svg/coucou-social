@@ -5,6 +5,7 @@ import { getActivityById, joinActivity } from '../services/activityService.ts';
 import { createActivityNotification } from '../services/messageService.ts';
 import { Activity } from '../types.ts';
 import { useAuth } from '../contexts/AuthContext.tsx';
+import { getCreditLevel } from '../utils/creditLevel.ts';
 
 const DetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -136,7 +137,7 @@ const DetailPage: React.FC = () => {
             <img src={act.organizer.avatar} className="size-10 rounded-full object-cover" alt="Avatar" />
             <div className="flex flex-col">
               <span className="text-sm font-semibold">{act.organizer.name}</span>
-              <span className="text-xs text-text-secondary dark:text-gray-500">发起人 · 信用分 {act.organizer.creditScore}</span>
+              <span className="text-xs text-text-secondary dark:text-gray-500">发起人 · <span className={getCreditLevel(act.organizer.creditScore).color}>{getCreditLevel(act.organizer.creditScore).name}</span></span>
             </div>
           </div>
           <div className="space-y-4 pt-1">

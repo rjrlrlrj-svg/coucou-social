@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { getUserActivities, getUserStats } from '../services/activityService.ts';
 import { Activity } from '../types.ts';
+import { getCreditLevel } from '../utils/creditLevel.ts';
 
 interface ProfilePageProps {
   onToggleDark: () => void;
@@ -86,10 +87,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onToggleDark, isDark }) => {
               <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
             </div>
             <h2 className="mt-4 text-xl font-bold">{user.name}</h2>
-            <div className="mt-2 flex items-center gap-1.5 bg-primary/10 px-3 py-1 rounded-full">
-              <span className="material-symbols-outlined text-primary text-[16px] fill-current">verified_user</span>
-              <span className="text-primary text-sm font-bold">信用分: {user.creditScore}</span>
+            <div className="mt-2 flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+              <span className="material-symbols-outlined text-primary text-[16px] fill-current">workspace_premium</span>
+              <span className={`text-sm font-bold ${getCreditLevel(user.creditScore).color}`}>{getCreditLevel(user.creditScore).name}</span>
             </div>
+            <p className="mt-1 text-xs text-gray-400 max-w-[200px] text-center">{getCreditLevel(user.creditScore).description}</p>
           </div>
 
           <div className="px-4 mb-6">

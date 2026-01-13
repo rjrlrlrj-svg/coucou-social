@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { updateUserProfile, updatePassword } from '../services/authService.ts';
+import { getCreditLevel } from '../utils/creditLevel.ts';
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -164,8 +165,8 @@ const SettingsPage: React.FC = () => {
           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">账号安全</label>
           <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b border-gray-50 dark:border-gray-800">
-              <span className="text-sm font-medium">当前信用分</span>
-              <span className="text-sm font-black text-primary">{user.creditScore}</span>
+              <span className="text-sm font-medium">等级</span>
+              <span className={`text-sm font-bold ${getCreditLevel(user.creditScore).color}`}>{getCreditLevel(user.creditScore).name}</span>
             </div>
             <button
               onClick={() => setShowPasswordModal(true)}
