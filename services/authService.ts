@@ -128,3 +128,15 @@ export const getSession = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return session;
 };
+
+// 修改密码
+export const updatePassword = async (newPassword: string): Promise<void> => {
+    const { error } = await supabase.auth.updateUser({
+        password: newPassword
+    });
+
+    if (error) {
+        console.error('Update password error:', error.message);
+        throw new Error(error.message);
+    }
+};

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import { updateUserProfile } from '../services/authService.ts';
+import { updateUserProfile, updatePassword } from '../services/authService.ts';
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,6 +11,13 @@ const SettingsPage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // 密码修改相关状态
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   // 初始化用户数据
   useEffect(() => {
@@ -50,6 +57,35 @@ const SettingsPage: React.FC = () => {
     } catch (error) {
       console.error('退出失败:', error);
       setIsLoggingOut(false);
+    }
+  };
+
+  // 修改密码
+  const handlePasswordChange = async () => {
+    setPasswordError('');
+
+    if (newPassword.length < 6) {
+      setPasswordError('密码至少需要6个字符');
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('两次输入的密码不一致');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+
+    try {
+      await updatePassword(newPassword);
+      alert('密码修改成功！');
+      setShowPasswordModal(false);
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (error: any) {
+      setPasswordError(error.message || '密码修改失败');
+    } finally {
+      setIsUpdatingPassword(false);
     }
   };
 
@@ -131,10 +167,13 @@ const SettingsPage: React.FC = () => {
               <span className="text-sm font-medium">当前信用分</span>
               <span className="text-sm font-black text-primary">{user.creditScore}</span>
             </div>
-            <div className="flex items-center justify-between p-4 opacity-50">
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="flex items-center justify-between p-4 w-full text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
               <span className="text-sm font-medium">修改密码</span>
               <span className="material-symbols-outlined text-gray-300 text-[20px]">chevron_right</span>
-            </div>
+            </button>
           </div>
         </section>
 
@@ -162,6 +201,61 @@ const SettingsPage: React.FC = () => {
           <p className="text-[10px] text-gray-300 font-black tracking-[0.2em]">COUCOU VERSION 1.2.0</p>
         </div>
       </main>
+
+      {/* 修改密码弹窗 */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-surface-dark rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold">修改密码</h2>
+              <button onClick={() => setShowPasswordModal(false)} className="size-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {passwordError && (
+              <div className="bg-red-50 dark:bg-red-500/10 text-red-500 text-sm px-4 py-3 rounded-xl">
+                {passwordError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400">新密码</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border-none rounded-xl outline-none text-sm"
+                  placeholder="请输入新密码（至少6位）"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400">确认新密码</label>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  className="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border-none rounded-xl outline-none text-sm"
+                  placeholder="请再次输入新密码"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handlePasswordChange}
+              disabled={isUpdatingPassword}
+              className="w-full h-12 bg-primary hover:bg-primary-dark active:scale-[0.98] disabled:opacity-50 text-white text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              {isUpdatingPassword ? (
+                <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                '确认修改'
+              )}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
