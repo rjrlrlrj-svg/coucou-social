@@ -262,3 +262,78 @@ export const getUserStats = async (userId: string): Promise<{ started: number; j
         joined: joined || 0
     };
 };
+
+// 更新活动信息
+export const updateActivity = async (
+    activityId: string,
+    updates: Partial<{
+        title: string;
+        description: string;
+        time: string;
+        location: string;
+        address: string;
+        costType: string;
+        costDetail: string;
+        maxParticipants: number;
+    }>,
+    organizerId: string
+): Promise<Activity | null> => {
+    // 验证是否为发起人
+    const { data: existing } = await supabase
+        .from('activities')
+        .select('organizer_id, title')
+        .eq('id', activityId)
+        .single();
+
+    if (!existing || existing.organizer_id !== organizerId) {
+        throw new Error('无权编辑此活动');
+    }
+
+    // 构建更新对象
+    const dbUpdates: Record<string, any> = {};
+    if (updates.title !== undefined) dbUpdates.title = updates.title;
+    if (updates.description !== undefined) dbUpdates.description = updates.description;
+    if (updates.time !== undefined) dbUpdates.time = new Date(updates.time).toISOString();
+    if (updates.location !== undefined) dbUpdates.location = updates.location;
+    if (updates.address !== undefined) dbUpdates.address = updates.address;
+    if (updates.costType !== undefined) dbUpdates.cost_type = updates.costType;
+    if (updates.costDetail !== undefined) dbUpdates.cost_detail = updates.costDetail;
+    if (updates.maxParticipants !== undefined) dbUpdates.max_participants = updates.maxParticipants;
+
+    const { error } = await supabase
+        .from('activities')
+        .update(dbUpdates)
+        .eq('id', activityId);
+
+    if (error) {
+        console.error('Error updating activity:', error.message);
+        throw new Error(error.message);
+    }
+
+    // 通知所有参与者
+    await notifyParticipantsOnUpdate(activityId, existing.title);
+
+    return getActivityById(activityId);
+};
+
+// 向活动的所有参与者发送更新通知
+const notifyParticipantsOnUpdate = async (activityId: string, activityTitle: string): Promise<void> => {
+    // 获取所有参与者
+    const { data: participants } = await supabase
+        .from('activity_participants')
+        .select('user_id')
+        .eq('activity_id', activityId);
+
+    if (!participants || participants.length === 0) return;
+
+    // 为每个参与者创建系统通知
+    const notifications = participants.map(p => ({
+        sender_id: p.user_id,
+        receiver_id: p.user_id,
+        content: `【${activityTitle}】活动信息已更新，请查看最新详情。`,
+        type: 'system',
+        activity_id: activityId
+    }));
+
+    await supabase.from('chat_messages').insert(notifications);
+};

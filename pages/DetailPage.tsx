@@ -113,6 +113,10 @@ const DetailPage: React.FC = () => {
         <div className="absolute top-0 left-0 right-0 p-4 pt-12 flex justify-between items-center z-10 text-white">
           <button onClick={() => navigate(-1)} className="size-10 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center"><span className="material-symbols-outlined">arrow_back_ios_new</span></button>
           <div className="flex gap-3">
+            {/* 仅发起人可见的编辑按钮 */}
+            {user && act.participants?.[0]?.id === user.id && (
+              <button onClick={() => navigate(`/activity/edit/${id}`)} className="size-10 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center"><span className="material-symbols-outlined">edit</span></button>
+            )}
             <button className="size-10 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center"><span className="material-symbols-outlined">favorite_border</span></button>
             <button className="size-10 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center"><span className="material-symbols-outlined">share</span></button>
           </div>
@@ -179,10 +183,10 @@ const DetailPage: React.FC = () => {
             onClick={handleApply}
             disabled={isApplying || hasApplied || act.status === 'full'}
             className={`flex-1 h-12 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all ${hasApplied
-                ? 'bg-emerald-500 text-white cursor-default'
-                : act.status === 'full'
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-primary hover:bg-primary-dark active:scale-[0.98] text-white shadow-primary/20'
+              ? 'bg-emerald-500 text-white cursor-default'
+              : act.status === 'full'
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-primary hover:bg-primary-dark active:scale-[0.98] text-white shadow-primary/20'
               }`}
           >
             {isApplying ? (

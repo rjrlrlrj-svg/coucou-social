@@ -12,6 +12,7 @@ import CreatePage from './pages/CreatePage.tsx';
 import MessagesPage from './pages/MessagesPage.tsx';
 import ExplorePage from './pages/ExplorePage.tsx';
 import SettingsPage from './pages/SettingsPage.tsx';
+import EditActivityPage from './pages/EditActivityPage.tsx';
 import BottomNav from './components/BottomNav.tsx';
 
 // Protected route wrapper
@@ -108,6 +109,9 @@ const AppContent: React.FC = () => {
         } />
         <Route path="/activity/:id" element={
           <ProtectedRoute><DetailPage /></ProtectedRoute>
+        } />
+        <Route path="/activity/edit/:id" element={
+          <ProtectedRoute><EditActivityPage /></ProtectedRoute>
         } />
         <Route path="/profile" element={
           <ProtectedRoute><ProfilePage onToggleDark={toggleDarkMode} isDark={isDarkMode} /></ProtectedRoute>
