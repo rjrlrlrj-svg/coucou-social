@@ -4,20 +4,52 @@ import { createClient } from '@supabase/supabase-js';
 // Supabase configuration
 
 // Supabase configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Sanitize URL: remove trailing slashes, spaces, and frequent mistake suffixes like /v1
+const cleanUrl = (url?: string) => {
+  if (!url) return '';
+  return url.trim().replace(/\/+$/, '').replace(/\/v1$/, '');
+};
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('CRITICAL: Supabase credentials missing!');
+const supabaseUrl = cleanUrl(import.meta.env.VITE_SUPABASE_URL);
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
+
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your_supabase_project_url') {
+  console.error('CRITICAL: Supabase config missing/invalid. Check .env.local or Netlify env vars.');
+} else {
+  console.log(`Supabase Client Initialized: ${supabaseUrl.substring(0, 15)}...`);
 }
 
-// Create client only if credentials exist, otherwise create a dummy or throw controlled error
-// For now we create it, but catching errors is hard for sync createClient.
-// Better to pass empty strings if undefined, as createClient might validate format.
+// Create client
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseAnonKey || 'placeholder'
 );
+
+// 验证与 Supabase 的连接状态，用于在应用启动时进行健康检查
+// 验证与 Supabase 的连接状态，用于在应用启动时进行健康检查
+export const verifyConnection = async () => {
+  // 如果使用的是占位符 URL，直接视为连接失败
+  if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+    console.error('Connection check failed: Using placeholder URL');
+    return false;
+  }
+
+  try {
+    // 并行检查数据库和认证服务
+    const [dbCheck, authCheck] = await Promise.all([
+      supabase.from('activities').select('count', { count: 'exact', head: true }),
+      supabase.auth.getSession()
+    ]);
+
+    if (dbCheck.error) throw dbCheck.error;
+    if (authCheck.error) throw authCheck.error;
+
+    return true;
+  } catch (e) {
+    console.error('Supabase connection failed:', e);
+    return false;
+  }
+};
 
 // Database types
 export interface DbUser {

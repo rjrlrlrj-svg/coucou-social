@@ -34,7 +34,12 @@ const RegisterPage: React.FC = () => {
             await signUp(email, password, name);
             navigate('/home');
         } catch (err: any) {
-            setError(err.message || '注册失败，请重试');
+            console.error('Registration failed:', err);
+            // 尝试提取更详细的错误信息
+            const errorMessage = err.message === 'Failed to fetch'
+                ? '网络请求失败：请检查网络连接或是否使用了广告拦截插件'
+                : (err.message || '注册失败，请重试');
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }

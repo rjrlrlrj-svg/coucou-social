@@ -42,8 +42,19 @@ const AppContent: React.FC = () => {
   const { user } = useAuth();
   const showBottomNav = user && ['/home', '/profile', '/messages', '/explore'].includes(location.pathname);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(true);
 
   useEffect(() => {
+    console.log('App Build: 2026-01-13 12:56 - Verifying Connection...');
+    // 组件挂载时检查数据库连接状态
+    import('./services/supabase.ts').then(({ verifyConnection }) => {
+      verifyConnection().then(ok => {
+        setConnectionError(!ok);
+        setIsCheckingConnection(false);
+      });
+    });
+
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -52,6 +63,30 @@ const AppContent: React.FC = () => {
   }, [isDarkMode]);
 
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+
+  if (isCheckingConnection) {
+    return (
+      <div className="flex-1 flex items-center justify-center h-screen bg-background-light dark:bg-background-dark">
+        <div className="flex flex-col items-center gap-4">
+          <div className="size-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <p className="text-sm text-gray-500">正在连接服务器...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (connectionError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-red-50 text-red-800 text-center">
+        <div>
+          <span className="material-symbols-outlined text-[48px] mb-4">error</span>
+          <h1 className="text-xl font-bold mb-2">连接失败</h1>
+          <p className="text-sm">无法连接到 Supabase 服务器。</p>
+          <p className="text-xs mt-2 opacity-75">请检查 Netlify 环境变量配置 (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)。</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen max-w-md mx-auto relative bg-background-light dark:bg-background-dark overflow-hidden flex flex-col shadow-2xl">

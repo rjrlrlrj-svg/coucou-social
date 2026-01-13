@@ -11,6 +11,12 @@ export interface AuthUser {
 
 // Sign up with email and password
 export const signUp = async (email: string, password: string, name: string): Promise<AuthUser | null> => {
+    // 再次检查是否配置了有效 URL
+    const url = (supabase as any).supabaseUrl || '';
+    if (url.includes('placeholder')) {
+        throw new Error('系统配置错误：未检测到 Supabase URL，请检查 Netlify 环境变量');
+    }
+
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
