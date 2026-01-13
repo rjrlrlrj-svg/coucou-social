@@ -6,6 +6,12 @@ import { createActivity } from '../services/activityService.ts';
 import { ActivityCategory } from '../types.ts';
 import { useAuth } from '../contexts/AuthContext.tsx';
 
+// 导入合规的活动类别图片
+import badmintonImg from '../assets/images/badminton.png';
+import basketballImg from '../assets/images/basketball.png';
+import groupBuyImg from '../assets/images/group_buy.png';
+import mysteryGameImg from '../assets/images/mystery_game.png';
+
 const CreatePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -27,6 +33,15 @@ const CreatePage: React.FC = () => {
     { id: 'group_buy', label: '拼团', icon: 'shopping_bag' },
     { id: 'mystery_game', label: '剧本杀', icon: 'theater_comedy' }
   ];
+
+  // 根据活动类别选择合规图片
+  const categoryImages: Record<ActivityCategory, string> = {
+    badminton: badmintonImg,
+    basketball: basketballImg,
+    group_buy: groupBuyImg,
+    mystery_game: mysteryGameImg,
+    all: badmintonImg // 默认图片
+  };
 
   const handlePolish = async () => {
     if (!title || !description) return;
@@ -63,7 +78,7 @@ const CreatePage: React.FC = () => {
         costType: cost,
         costDetail: cost === 'AA制' ? '按实际发生结算' : '固定费用',
         maxParticipants,
-        images: ['https://images.unsplash.com/photo-1521412644187-c49fa049e84d?q=80&w=1000&auto=format&fit=crop']
+        images: [categoryImages[category]]
       }, user.id);
 
       navigate('/home');
@@ -94,8 +109,8 @@ const CreatePage: React.FC = () => {
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
                 className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all ${category === cat.id
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-white dark:border-surface-dark bg-white dark:bg-surface-dark text-gray-400'
+                  ? 'border-primary bg-primary/5 text-primary'
+                  : 'border-white dark:border-surface-dark bg-white dark:bg-surface-dark text-gray-400'
                   }`}
               >
                 <span className="material-symbols-outlined">{cat.icon}</span>
