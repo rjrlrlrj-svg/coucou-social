@@ -44,7 +44,7 @@ const AppContent: React.FC = () => {
   const showBottomNav = user && ['/home', '/profile', '/messages', '/explore'].includes(location.pathname);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [connectionError, setConnectionError] = useState(false);
-  const [isCheckingConnection, setIsCheckingConnection] = useState(true);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(false); // Demo Mode: Don't block
 
   useEffect(() => {
     console.log('App Build: 2026-01-13 12:56 - Verifying Connection...');
