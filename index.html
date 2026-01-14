@@ -128,7 +128,9 @@
             <div class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
                 <a href="#hero" class="hover:text-primary transition-colors">首页</a>
                 <a href="#features" class="hover:text-primary transition-colors">功能展示</a>
-                <a href="#" class="hover:text-primary transition-colors" onclick="comingSoon(event)">关于我们</a>
+                <!-- 新增反馈与关于入口 -->
+                <a href="#" class="hover:text-primary transition-colors" onclick="showFeedback(event)">反馈</a>
+                <a href="#" class="hover:text-primary transition-colors" onclick="showAbout(event)">关于我们</a>
             </div>
             <div class="flex items-center gap-4">
                 <button
@@ -259,6 +261,18 @@
         </div>
     </footer>
 
+    <!-- 通用弹窗 (Modal) -->
+    <div id="coucouModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- 背景遮罩 -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+
+        <!-- 弹窗内容 -->
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 transform scale-95 opacity-0 transition-all duration-300"
+            id="modalContent">
+            <!-- 动态渲染区域 -->
+        </div>
+    </div>
+
     <!-- 脚本逻辑 -->
     <script>
         // 滚动动画
@@ -271,44 +285,209 @@
 
         // 界面数据 (生成的高保真 UI)
         const uiData = [
-            // 首页
             "assets/images/coucou_home_ui.png",
-            // 详情页
             "assets/images/coucou_detail_ui.png",
-            // 个人页
             "assets/images/coucou_profile_ui.png"
         ];
 
         // 界面切换功能
         function switchUI(index, btn) {
-            // Update Buttons
             document.querySelectorAll('.ui-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            // Update Image
             const img = document.getElementById('appScreen');
-            img.style.opacity = '0'; // Fade out
-
+            img.style.opacity = '0';
             setTimeout(() => {
                 img.src = uiData[index];
-                img.onload = () => { img.style.opacity = '1'; }; // Fade in
+                img.onload = () => { img.style.opacity = '1'; };
             }, 200);
         }
 
-        // 通用点击反馈
-        function comingSoon(e) {
-            e.preventDefault();
-            // 简单的原生弹窗，实际项目中可换成 Toast
-            // 创建一个临时的 Toast 元素
-            const toast = document.createElement('div');
-            toast.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-6 py-3 rounded-xl font-medium shadow-2xl z-[100] animate-bounce';
-            toast.innerText = '✨ 功能开发中，敬请期待！';
-            document.body.appendChild(toast);
+        // ================== Modal & Logic ==================
 
+        function closeModal() {
+            const modal = document.getElementById('coucouModal');
+            const content = document.getElementById('modalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
             setTimeout(() => {
-                toast.remove();
-            }, 2000);
+                modal.classList.add('hidden');
+            }, 200);
         }
+
+        function openModal(html) {
+            const modal = document.getElementById('coucouModal');
+            const content = document.getElementById('modalContent');
+            content.innerHTML = html;
+
+            modal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before transition
+            requestAnimationFrame(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            });
+        }
+
+        // 1. 关于我们
+        function showAbout(e) {
+            e.preventDefault();
+            const html = `
+                <div class="p-8 text-center">
+                    <div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-3xl">info</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-6">关于我们</h3>
+                    
+                    <div class="space-y-4 text-left bg-gray-50 p-6 rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-gray-400">chat</span>
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase font-bold">微信号</p>
+                                <p class="text-lg font-medium select-all">18043198767</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200"></div>
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-gray-400">mail</span>
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase font-bold">邮箱</p>
+                                <p class="text-lg font-medium select-all">rjrlrlrj@163.com</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="closeModal()" class="mt-8 w-full bg-black text-white py-3 rounded-xl font-bold hover:bg-primary transition-colors">
+                        关闭
+                    </button>
+                </div>
+            `;
+            openModal(html);
+        }
+
+        // 2. 反馈 - 主菜单
+        function showFeedback(e) {
+            e.preventDefault();
+            const html = `
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold mb-2">👋 您的反馈很重要</h3>
+                    <p class="text-gray-500 mb-8">帮助我们把 CouCou 做得更好</p>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="handleUseful()" class="group relative overflow-hidden bg-green-50 hover:bg-green-100 border-2 border-green-100 hover:border-green-200 transition-all p-4 rounded-2xl text-left">
+                            <span class="material-symbols-outlined text-3xl text-green-600 mb-2 block group-hover:scale-110 transition-transform">thumb_up</span>
+                            <span class="font-bold text-green-800">很有用</span>
+                            <p class="text-xs text-green-600/70 mt-1">给开发者点个赞</p>
+                        </button>
+
+                        <button onclick="showSuggestionForm()" class="group relative overflow-hidden bg-blue-50 hover:bg-blue-100 border-2 border-blue-100 hover:border-blue-200 transition-all p-4 rounded-2xl text-left">
+                            <span class="material-symbols-outlined text-3xl text-blue-600 mb-2 block group-hover:scale-110 transition-transform">edit_note</span>
+                            <span class="font-bold text-blue-800">提建议</span>
+                            <p class="text-xs text-blue-600/70 mt-1">我有话要说</p>
+                        </button>
+                    </div>
+                </div>
+            `;
+            openModal(html);
+        }
+
+        // 3. 反馈 - 很有用 (记录点赞)
+        function handleUseful() {
+            // LocalStorage Logic
+            const current = parseInt(localStorage.getItem('coucou_stats_likes') || 0);
+            localStorage.setItem('coucou_stats_likes', current + 1);
+
+            // UI Feedback
+            const html = `
+                <div class="p-12 text-center animate-pulse">
+                    <span class="material-symbols-outlined text-6xl text-green-500 mb-4">check_circle</span>
+                    <h3 class="text-2xl font-bold">感谢支持！</h3>
+                    <p class="text-gray-500 mt-2">开发者已收到您的鼓励 ❤️</p>
+                </div>
+            `;
+            openModal(html);
+            setTimeout(closeModal, 1500);
+        }
+
+        // 4. 反馈 - 提建议表单
+        function showSuggestionForm() {
+            const html = `
+                <div class="p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">📝 写下您的建议</h3>
+                        <button onclick="showFeedback(event)" class="text-gray-400 hover:text-black">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                        </button>
+                    </div>
+                    
+                    <textarea id="suggestionInput" 
+                        class="w-full h-32 bg-gray-50 border-2 border-gray-100 rounded-xl p-4 text-lg focus:outline-none focus:border-primary transition-colors resize-none"
+                        placeholder="想对我们说点什么... (限30字)"
+                        maxlength="30"
+                    ></textarea>
+                    
+                    <div class="flex justify-end mt-2 mb-6">
+                        <span id="charCount" class="text-xs font-bold text-gray-400">0 / 30</span>
+                    </div>
+
+                    <button onclick="submitSuggestion()" class="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-yellow-500 transition-colors shadow-lg shadow-primary/20">
+                        发送建议
+                    </button>
+                </div>
+            `;
+            openModal(html);
+
+            // Add input listener for char count
+            setTimeout(() => {
+                const input = document.getElementById('suggestionInput');
+                const count = document.getElementById('charCount');
+                input.addEventListener('input', () => {
+                    count.innerText = `${input.value.length} / 30`;
+                });
+                input.focus();
+            }, 50);
+        }
+
+        // 5. 反馈 - 提交建议
+        function submitSuggestion() {
+            const input = document.getElementById('suggestionInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            // LocalStorage Logic
+            const list = JSON.parse(localStorage.getItem('coucou_feedback_list') || '[]');
+            list.push({
+                date: new Date().toLocaleString(),
+                content: text
+            });
+            localStorage.setItem('coucou_feedback_list', JSON.stringify(list));
+
+            // UI Feedback
+            const html = `
+                <div class="p-12 text-center">
+                    <span class="material-symbols-outlined text-6xl text-blue-500 mb-4">mark_email_read</span>
+                    <h3 class="text-2xl font-bold">收到啦！</h3>
+                    <p class="text-gray-500 mt-2">我们会认真阅读您的每一条建议。</p>
+                </div>
+            `;
+            openModal(html);
+            setTimeout(closeModal, 1500);
+        }
+
+        // 6. Admin Stats (Console Helper)
+        // 在控制台输入 showAdminStats() 即可查看
+        window.showAdminStats = function () {
+            const likes = localStorage.getItem('coucou_stats_likes') || 0;
+            const messages = JSON.parse(localStorage.getItem('coucou_feedback_list') || '[]');
+
+            console.group('📊 后台统计数据 (本地模拟)');
+            console.log(`%c👍 点赞数: ${likes}`, 'font-size: 16px; color: green; font-weight: bold;');
+            console.log(`%c📝 建议列表 (${messages.length}):`, 'font-size: 14px; font-weight: bold;');
+            console.table(messages);
+            console.groupEnd();
+
+            alert(`后台数据统计:\n\n👍 点赞数: ${likes}\n📝 建议数: ${messages.length}\n\n(详细内容请按 F12 在 Console 控制台查看)`);
+        }
+
     </script>
 </body>
 
