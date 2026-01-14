@@ -255,7 +255,8 @@
         <div class="max-w-7xl mx-auto px-6 text-center">
             <span class="text-2xl font-bold tracking-tight text-primary block mb-2">CouCou</span>
             <p class="text-gray-400 text-sm">简单组团，一起凑凑</p>
-            <div class="mt-8 text-gray-300 text-xs">
+            <div class="mt-8 text-gray-300 text-xs select-none cursor-pointer hover:text-gray-400 transition-colors"
+                onclick="handleSecretAdmin(this)">
                 &copy; 2026 CouCou Inc. All rights reserved.
             </div>
         </div>
@@ -488,6 +489,27 @@
             alert(`后台数据统计:\n\n👍 点赞数: ${likes}\n📝 建议数: ${messages.length}\n\n(详细内容请按 F12 在 Console 控制台查看)`);
         }
 
+        // 7. Secret Admin Trigger
+        let tapCount = 0;
+        let tapTimer = null;
+        window.handleSecretAdmin = function (el) {
+            tapCount++;
+
+            // Visual feedback
+            el.style.color = '#f49d25';
+            setTimeout(() => el.style.color = '', 150);
+
+            if (tapTimer) clearTimeout(tapTimer);
+
+            tapTimer = setTimeout(() => {
+                tapCount = 0; // Reset if too slow
+            }, 1000);
+
+            if (tapCount >= 5) {
+                showAdminStats();
+                tapCount = 0;
+            }
+        }
     </script>
 </body>
 
