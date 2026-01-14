@@ -32,6 +32,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Check initial session
         getCurrentUser().then((user) => {
             setUser(user);
+        }).catch((err) => {
+            console.warn('Auth check failed:', err);
+            setUser(null);
+        }).finally(() => {
             setLoading(false);
         });
 

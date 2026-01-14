@@ -69,28 +69,37 @@ export const signOut = async (): Promise<void> => {
 
 // Get current authenticated user with profile
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
-    const { data: { user } } = await supabase.auth.getUser();
+    try {
+        // Add timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth check timeout')), 5000));
+        const authPromise = supabase.auth.getUser();
 
-    if (!user) return null;
+        const { data: { user } } = await Promise.race([authPromise, timeoutPromise]) as any;
 
-    const { data: profile, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+        if (!user) return null;
 
-    if (error || !profile) {
-        console.error('Error fetching user profile:', error?.message);
+        const { data: profile, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+        if (error || !profile) {
+            console.error('Error fetching user profile:', error?.message);
+            return null;
+        }
+
+        return {
+            id: profile.id,
+            email: profile.email,
+            name: profile.name,
+            avatar: profile.avatar,
+            creditScore: profile.credit_score
+        };
+    } catch (e) {
+        console.warn('Auth check skipped/failed (Demo Mode):', e);
         return null;
     }
-
-    return {
-        id: profile.id,
-        email: profile.email,
-        name: profile.name,
-        avatar: profile.avatar,
-        creditScore: profile.credit_score
-    };
 };
 
 // Update user profile
