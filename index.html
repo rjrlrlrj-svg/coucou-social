@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CouCou - 凑凑</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
     <!-- Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
@@ -46,22 +50,44 @@
             font-family: 'Noto Sans SC', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .safe-area-pb {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .safe-area-pt {
+            padding-top: env(safe-area-inset-top, 24px);
+        }
+
+        /* 状态栏安全区域 */
+        #root {
+            padding-top: env(safe-area-inset-top, 24px);
+        }
     </style>
     <!-- Process Shim for Gemini SDK -->
     <script>
-      window.process = {
-        env: {
-          API_KEY: "" 
-        }
-      };
+        window.process = {
+            env: {
+                API_KEY: ""
+            }
+        };
     </script>
-<link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-background-light text-text-main dark:bg-background-dark dark:text-white antialiased transition-colors duration-300">
+
+<body
+    class="bg-background-light text-text-main dark:bg-background-dark dark:text-white antialiased transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>

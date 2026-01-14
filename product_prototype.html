@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CouCou - 产品展示原型</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Noto Sans SC"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#f49d25',
+                        secondary: '#181511',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 自定义动画与交互样式 */
+        body {
+            background-color: #f8f7f5;
+            color: #181511;
+        }
+
+        /* 1. 产品展示与放大容器 */
+        .product-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            background: white;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+            cursor: crosshair;
+            /* 提示可缩放 */
+            aspect-ratio: 1 / 1;
+            /* 正方形展示区 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), filter 0.5s ease;
+            /* 放大平滑，颜色切换平滑 */
+            will-change: transform, filter;
+            /* 默认原点在中心，动态修改 */
+            transform-origin: center center;
+        }
+
+        /* 放大状态（通过JS类激活简单控制，或直接JS控制transform） */
+        .product-container:hover .product-image {
+            transform: scale(2);
+            /* 放大2倍 */
+        }
+
+        /* 2. 颜色切换动画 - 利用 Hue Rotate 模拟同款产品的颜色变化 (适用于演示) */
+        /* 实际项目中可能是切换 src，配合 opacity 动画 */
+        .color-variant-orange {
+            filter: hue-rotate(0deg);
+        }
+
+        .color-variant-blue {
+            filter: hue-rotate(200deg);
+        }
+
+        .color-variant-green {
+            filter: hue-rotate(100deg);
+        }
+
+        .color-variant-purple {
+            filter: hue-rotate(280deg);
+        }
+
+        /* 入场动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-enter {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* 选中态环绕圈 */
+        .color-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .color-btn::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            bottom: -4px;
+            left: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .color-btn.active::after {
+            border-color: #181511;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- 导航栏 (模拟) -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold tracking-tight">CouCou</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
+                <a href="#" class="hover:text-primary transition-colors">浏览活动</a>
+                <a href="#" class="hover:text-primary transition-colors">周边商城</a>
+                <a href="#" class="hover:text-primary transition-colors">关于我们</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
+                <button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <span class="material-symbols-outlined">shopping_bag</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主展示区 -->
+    <main class="flex-1 flex items-center justify-center p-6 md:p-12">
+        <div class="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
+
+            <!-- 左侧：产品展示与放大细节 -->
+            <div class="animate-enter">
+                <div class="product-container group" id="productContainer">
+                    <!-- 使用 assets/images/basketball.png 作为演示源 -->
+                    <!-- 如果本地没有运行web server，这里的图片可能无法加载。建议确保图片与html相对路径正确 -->
+                    <!-- 为了演示稳健性，如果图片加载失败，可以使用一个在线占位符或SVG -->
+                    <img src="assets/images/basketball.png" alt="CouCou 专业竞赛篮球"
+                        class="product-image color-variant-orange" id="productImage"
+                        onerror="this.src='https://images.unsplash.com/photo-1519861531473-92002639313cc?q=80&w=1000&auto=format&fit=crop'">
+
+                    <!-- 放大提示 (移动端隐藏，PC端显示) -->
+                    <div
+                        class="absolute bottom-6 left-6 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-gray-500 shadow-sm pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block">
+                        <span class="align-middle material-symbols-outlined text-sm mr-1">zoom_in</span>
+                        移动鼠标查看细节
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：产品信息与控制 -->
+            <div class="space-y-8 animate-enter delay-1">
+
+                <!-- 标题与价格 -->
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span
+                            class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">New
+                            Arrival</span>
+                        <span
+                            class="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wider">Premium</span>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-[#181511] mb-4 tracking-tight leading-tight">
+                        CouCou <br />Pro Basketball
+                    </h1>
+                    <div class="flex items-baseline gap-4">
+                        <span class="text-3xl font-bold text-primary">¥ 299.00</span>
+                        <span class="text-lg text-gray-400 line-through">¥ 399.00</span>
+                    </div>
+                </div>
+
+                <!-- 描述 -->
+                <p class="text-gray-600 leading-relaxed text-lg max-w-md animate-enter delay-2">
+                    专为街头竞技设计。采用顶级超纤皮革，提供极致手感与控球体验。独家配色方案，让你在球场上成为绝对焦点。
+                </p>
+
+                <!-- 颜色选择 -->
+                <div class="animate-enter delay-3">
+                    <label class="block text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">选择配色</label>
+                    <div class="flex gap-4">
+                        <!-- 颜色按钮：橙色 -->
+                        <button
+                            class="color-btn active w-12 h-12 rounded-full bg-[#f49d25] shadow-lg shadow-orange-500/30"
+                            onclick="changeColor(this, 0)" aria-label="经典橙"></button>
+                        <!-- 颜色按钮：绿色 -->
+                        <button class="color-btn w-12 h-12 rounded-full bg-[#4ade80] shadow-lg shadow-green-500/30"
+                            onclick="changeColor(this, 100)" aria-label="清新绿"></button>
+                        <!-- 颜色按钮：蓝色 -->
+                        <button class="color-btn w-12 h-12 rounded-full bg-[#3b82f6] shadow-lg shadow-blue-500/30"
+                            onclick="changeColor(this, 200)" aria-label="深邃蓝"></button>
+                        <!-- 颜色按钮：紫色 -->
+                        <button class="color-btn w-12 h-12 rounded-full bg-[#a855f7] shadow-lg shadow-purple-500/30"
+                            onclick="changeColor(this, 280)" aria-label="电光紫"></button>
+                    </div>
+                </div>
+
+                <!-- 购买按钮 -->
+                <div class="flex gap-4 pt-4 animate-enter delay-3">
+                    <button
+                        class="flex-1 bg-[#181511] text-white h-14 rounded-2xl font-bold text-lg hover:bg-black hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-xl shadow-black/10 flex items-center justify-center gap-2">
+                        <span>立即购买</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                    <button
+                        class="h-14 w-14 border-2 border-gray-200 rounded-2xl flex items-center justify-center hover:border-gray-900 hover:bg-gray-50 transition-colors">
+                        <span class="material-symbols-outlined">favorite</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 核心功能1 & 2：产品展示与放大查看 ---
+        const container = document.getElementById('productContainer');
+        const img = document.getElementById('productImage');
+
+        container.addEventListener('mousemove', (e) => {
+            // 获取容器的位置信息
+            const rect = container.getBoundingClientRect();
+
+            // 计算鼠标在容器内的相对坐标 (0-100%)
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+            // 设置 transform-origin 跟随鼠标位置
+            // 这里的变换中心点设置在鼠标位置，配合CSS中的scale(2) hover效果，
+            // 实现自然的"局部放大"视觉体验。
+            img.style.transformOrigin = `${x}% ${y}%`;
+        });
+
+        // 鼠标移出时，稍微复位（可选，CSS中已有transform transition处理平滑复原）
+        container.addEventListener('mouseleave', () => {
+            // 保持 transformOrigin 在最后位置或者复位到中心看起来更自然？
+            // 通常复位到中心会让缩放退出的动画收缩回中心，看起来比较规整。
+            setTimeout(() => {
+                img.style.transformOrigin = 'center center';
+            }, 200); // 略微延迟等待scale动画开始
+        });
+
+
+        // --- 核心功能3：颜色切换动画 ---
+        function changeColor(btn, hueAngle) {
+            // 1. 更新按钮激活状态
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // 2. 更新产品图颜色
+            // 使用 CSS filter: hue-rotate() 来实现丝滑的颜色过渡动画
+            // 这种方式只需要一张图片即可演示多种配色，
+            // 且 transition 属性（定义在 CSS .product-image 中）会自动处理中间帧，形成动画。
+            img.style.filter = `hue-rotate(${hueAngle}deg)`;
+
+            // 3. 添加一个轻微的缩放反馈，增强交互感
+            img.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                // 如果当前不在 hover 状态，则恢复；如果在 hover 状态，CSS hover 优先级会覆盖这个 scale(1)
+                // 注意：这里需要处理与 hover scale 的冲突。
+                // 简单的做法是只在非hover时清除行内样式，或者暂时移除行内transform让CSS接管
+                img.style.transform = '';
+            }, 200);
+        }
+    </script>
+</body>
+
+</html>

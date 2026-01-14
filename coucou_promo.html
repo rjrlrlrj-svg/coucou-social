@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CouCou - 简单组团，一起凑凑</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts & Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&family=Plus+Jakarta+Sans:wght@700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1"
+        rel="stylesheet" />
+
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f49d25',
+                        dark: '#181511',
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans SC"', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'click': 'click 0.5s ease-in-out',
+                        'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        click: {
+                            '0%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)' },
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.5)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+
+        /* 舞台容器 */
+        #stage {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        /* 手机模型 */
+        .phone-mockup {
+            width: 320px;
+            height: 640px;
+            background: #fff;
+            border-radius: 40px;
+            border: 12px solid #2d2d2d;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+            transform: translateY(100vh);
+            /* 初始在屏幕外 */
+            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* 手机刘海 */
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #2d2d2d;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 50;
+        }
+
+        /* 动画序列控制器类 */
+        .scene {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            flex-direction: column;
+        }
+
+        .scene.active {
+            display: flex;
+        }
+
+        /* 模拟光标 */
+        .cursor {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            z-index: 100;
+            transform: translate(-50%, -50%);
+            display: none;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(2px);
+        }
+
+        .cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* 结束标语 */
+        #outro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(244, 157, 37, 0.95);
+            color: #fff;
+            clip-path: circle(0% at 50% 50%);
+            transition: clip-path 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 200;
+        }
+
+        .avatar-float {
+            animation: floatAvatar 3s ease-in-out infinite;
+        }
+
+        @keyframes floatAvatar {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* 重播按钮 */
+        #replay-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="stage">
+        <!-- 手机容器 -->
+        <div id="phone" class="phone-mockup">
+            <div class="notch"></div>
+
+            <!-- 场景1: 首页活动列表 -->
+            <div id="scene-home" class="scene active bg-gray-50 pt-10 px-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-dark">发现活动</h2>
+                    <span class="material-symbols-outlined text-gray-400">notifications</span>
+                </div>
+
+                <!-- 模拟活动卡片 1 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm mb-4 opacity-50 scale-95 origin-top">
+                    <div class="flex gap-3">
+                        <div class="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">🏸</div>
+                        <div>
+                            <div class="font-bold text-dark">周五羽毛球养生局</div>
+                            <div class="text-xs text-gray-500 mt-1">18:00 • 浦东体育馆</div>
+                            <div class="flex -space-x-2 mt-2">
+                                <div class="w-6 h-6 rounded-full bg-gray-200 border-2 border-white"></div>
+                                <div class="w-6 h-6 rounded-full bg-gray-300 border-2 border-white"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模拟活动卡片 2 (Target) -->
+                <div id="target-card"
+                    class="bg-white p-4 rounded-2xl shadow-md border-l-4 border-primary relative overflow-hidden transform transition-transform duration-300">
+                    <div class="flex gap-4">
+                        <!-- 使用 Emoji 替代图片以确保演示稳定，如果图片加载失败 -->
+                        <div
+                            class="w-20 h-20 bg-orange-100 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+                            <img src="assets/images/basketball.png" class="w-full h-full object-cover"
+                                onerror="this.style.display='none';this.parentNode.innerText='🏀'">
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-lg text-dark leading-tight">周日热血篮球局</div>
+                            <div class="text-xs text-orange-600 font-medium mt-1">仅剩 2 个名额</div>
+                            <div class="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                洛克公园
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部导航模拟 -->
+                <div
+                    class="absolute bottom-0 left-0 w-full h-16 bg-white border-t flex justify-around items-center text-gray-300">
+                    <span class="material-symbols-outlined text-primary">explore</span>
+                    <span class="material-symbols-outlined">chat</span>
+                    <span class="material-symbols-outlined">person</span>
+                </div>
+            </div>
+
+            <!-- 场景2: 详情页 -->
+            <div id="scene-detail" class="scene bg-white flex flex-col">
+                <div class="h-48 bg-gray-100 relative">
+                    <img src="assets/images/basketball.png" class="w-full h-full object-cover"
+                        onerror="this.style.display='none';this.parentNode.classList.add('bg-orange-500')">
+                    <button class="absolute top-4 left-4 bg-white/50 rounded-full p-1 text-dark backdrop-blur-md">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 p-6 flex flex-col">
+                    <div class="flex justify-between items-start mb-2">
+                        <h1 class="text-2xl font-bold text-dark">周日热血篮球局</h1>
+                        <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded-lg text-xs font-bold">5v5</span>
+                    </div>
+
+                    <p class="text-gray-500 text-sm mb-6">不论水平，只要热爱！缺两个能跑的后卫，打完一起吃火锅！ 🔥</p>
+
+                    <div class="mb-auto">
+                        <h3 class="text-sm font-bold text-gray-900 mb-3">已报名 (8/10)</h3>
+                        <div class="flex flex-wrap gap-2" id="avatar-container">
+                            <!-- 现有头像 -->
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-200 border-2 border-white bg-[url('https://i.pravatar.cc/150?u=1')] bg-cover">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-200 border-2 border-white bg-[url('https://i.pravatar.cc/150?u=2')] bg-cover">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-200 border-2 border-white bg-[url('https://i.pravatar.cc/150?u=3')] bg-cover">
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-400 border-2 border-white text-white flex items-center justify-center text-xs">
+                                +5</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button id="join-btn"
+                            class="w-full h-14 bg-dark text-white rounded-2xl font-bold text-lg shadow-xl shadow-gray-200 flex items-center justify-center gap-2 transform transition-all">
+                            <span>一键加入</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 光标 -->
+            <div id="cursor" class="cursor"></div>
+        </div>
+    </div>
+
+    <!-- 结尾 Slogan -->
+    <div id="outro">
+        <div class="text-center p-8">
+            <div
+                class="w-24 h-24 bg-white rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-2xl text-primary animate-float">
+                <span class="material-symbols-outlined text-5xl">groups</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black mb-4 tracking-tight drop-shadow-md">简单组团<br>一起凑凑</h1>
+            <p class="text-white/80 text-lg font-medium tracking-widest uppercase mt-4">CouCou App</p>
+        </div>
+    </div>
+
+    <button id="replay-btn" onclick="startAnimation()"
+        class="bg-white text-dark px-6 py-3 rounded-full font-bold shadow-lg hover:bg-gray-100 flex items-center gap-2">
+        <span class="material-symbols-outlined">replay</span> 再看一次
+    </button>
+
+    <script>
+        const $ = (s) => document.querySelector(s);
+        const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+        async function startAnimation() {
+            // Reset state
+            $('#stage').style.opacity = '1';
+            $('#phone').style.transform = 'translateY(100vh)';
+            $('#outro').style.clipPath = 'circle(0% at 50% 50%)';
+            $('#replay-btn').style.opacity = '0';
+            $('#replay-btn').style.pointerEvents = 'none';
+
+            // Reset internal scene state
+            $('#scene-home').classList.add('active');
+            $('#scene-detail').classList.remove('active');
+            const joinBtn = $('#join-btn');
+            joinBtn.className = "w-full h-14 bg-dark text-white rounded-2xl font-bold text-lg shadow-xl shadow-gray-200 flex items-center justify-center gap-2 transform transition-all";
+            joinBtn.innerHTML = "<span>一键加入</span>";
+
+            // Clear extra avatars
+            const avatars = document.getElementById('avatar-container');
+            while (avatars.children.length > 4) {
+                avatars.removeChild(avatars.lastChild);
+            }
+
+            await wait(500);
+
+            // 1. Phone Enters
+            $('#phone').style.transform = 'translateY(0)';
+            await wait(1200);
+
+            // 2. Cursor Appears & Moves to Card
+            const cursor = $('#cursor');
+            const card = $('#target-card');
+            const cardRect = card.getBoundingClientRect();
+
+            cursor.style.display = 'block';
+            cursor.style.top = '120%'; // Start from bottom
+            cursor.style.left = '50%';
+            cursor.style.transition = 'all 1s cubic-bezier(0.25, 1, 0.5, 1)'; // Natural movement
+
+            // Force reflow
+            cursor.offsetHeight;
+
+            // Move cursor to card
+            // Note: coordinates inside phone are tricky due to fixed/absolute mix, simpler to approximate relative to viewport
+            // Since phone is centered, card is roughly center screen.
+            cursor.style.top = '40%';
+            cursor.style.left = '50%';
+
+            await wait(1000);
+
+            // 3. Click Effect
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            card.style.transform = 'scale(0.95)';
+            await wait(150);
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            card.style.transform = 'scale(1)';
+
+            await wait(300);
+
+            // 4. Navigate to Detail
+            $('#scene-home').classList.remove('active');
+            $('#scene-detail').classList.add('active');
+            cursor.style.display = 'none'; // Hide cursor for clean look
+
+            await wait(1000);
+
+            // 5. Avatars Fly In (Simulate users joining)
+            const newAvatar1 = document.createElement('div');
+            newAvatar1.className = 'w-10 h-10 rounded-full border-2 border-white bg-blue-500 animate-pop-in flex items-center justify-center text-white font-bold text-xs';
+            newAvatar1.innerText = "Me";
+            avatars.appendChild(newAvatar1);
+
+            await wait(400);
+
+            const newAvatar2 = document.createElement('div');
+            newAvatar2.className = 'w-10 h-10 rounded-full border-2 border-white bg-green-500 animate-pop-in flex items-center justify-center text-white font-bold text-xs';
+            newAvatar2.innerText = "+1";
+            avatars.appendChild(newAvatar2);
+
+            await wait(800);
+
+            // 6. Button Interaction (Auto-join simulation)
+            joinBtn.style.transform = 'scale(0.95)';
+            await wait(100);
+            joinBtn.style.transform = 'scale(1)';
+            joinBtn.className = "w-full h-14 bg-green-500 text-white rounded-2xl font-bold text-lg shadow-xl shadow-green-200 flex items-center justify-center gap-2 transform transition-all";
+            joinBtn.innerHTML = "<span class='material-symbols-outlined'>check_circle</span><span>组局成功!</span>";
+
+            // 7. Confetti
+            const phoneRect = $('#phone').getBoundingClientRect();
+            const originX = (phoneRect.left + phoneRect.width / 2) / window.innerWidth;
+            const originY = (phoneRect.top + phoneRect.height / 1.5) / window.innerHeight;
+
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { x: originX, y: originY },
+                colors: ['#f49d25', '#181511', '#ffffff'] // Brand colors
+            });
+
+            await wait(2000);
+
+            // 8. Transition to Outro
+            $('#outro').style.clipPath = 'circle(150% at 50% 50%)';
+
+            await wait(2500);
+
+            // Show Replay
+            $('#replay-btn').style.opacity = '1';
+            $('#replay-btn').style.pointerEvents = 'auto';
+        }
+
+        // Auto start on load
+        window.addEventListener('load', startAnimation);
+
+    </script>
+</body>
+
+</html>
