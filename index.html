@@ -493,17 +493,23 @@
         let tapCount = 0;
         let tapTimer = null;
         window.handleSecretAdmin = function (el) {
-            tapCount++;
+            // Prevent text selection double-click behavior
+            if (window.getSelection) { window.getSelection().removeAllRanges(); }
 
-            // Visual feedback
+            tapCount++;
+            console.log('Admin Tap:', tapCount);
+
+            // Visual feedback - Flash Primary Color
+            const originalColor = el.style.color;
             el.style.color = '#f49d25';
-            setTimeout(() => el.style.color = '', 150);
+            setTimeout(() => el.style.color = originalColor, 150);
 
             if (tapTimer) clearTimeout(tapTimer);
 
+            // Reset count if no tap for 2 seconds (more forgiving)
             tapTimer = setTimeout(() => {
-                tapCount = 0; // Reset if too slow
-            }, 1000);
+                tapCount = 0;
+            }, 2000);
 
             if (tapCount >= 5) {
                 showAdminStats();
