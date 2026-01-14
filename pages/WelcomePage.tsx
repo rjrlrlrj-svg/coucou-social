@@ -8,7 +8,7 @@ const WelcomePage: React.FC = () => {
   return (
     <div className="relative flex flex-col h-screen w-full bg-[#0a0715] text-white overflow-hidden font-display">
       {/* Background Image Overlay */}
-      <div 
+      <div
         className="absolute inset-0 z-0 bg-cover bg-center brightness-50 opacity-60"
         style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCsxT2fyyB7FLmUAJKaVT--aEBU9MApzmUplTvgjhKVw3VnWDNfeZdvnHK5yknUVSWelUeCDMcN1OKYbrg19gsTGHvOh2HUFw-hiRYYqc2CERQEN0IaV2dpEEV_nLojPQ6ezWWzozpxmAbs99BV-dRwe1uUahK0FYGoehztntrotUwATgj0Wxvh6nvXHB8ZuTV4SEIU_rEKoGadDdVTfhzOvoFtWiYHy9NMjQ2tMjedTJR2CL6G1IBo7mcbMym5Jff5dpXk1oAVD1cy')` }}
       />
@@ -25,17 +25,17 @@ const WelcomePage: React.FC = () => {
 
         <div className="mb-8">
           <div className="relative w-64 h-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
-             <img 
-               src="https://lh3.googleusercontent.com/aida-public/AB6AXuD54VNdHpKbv2mgyWGEv9U-Q0ZVysP9Io9JmHMr-K_xlsZCApFLRbVHIq_OIIEcBw4EX5_qCA2n7YCrnV8t-g3gz2cRnUR4p2nE9fro9GNZ_4_kcGcM0yI7pMSK_NZYdyNgzUwunke_OZfoYv9aArxKCWn3wTVHeUdt2KYdAPpLTYij1_6HsNUiBe_lGOGLLj4odeVtmr35_LykgCfPGwRMuuFYRCY8apqxHQmZGVsD3NHTwEUE1GNLz-_E46acvY_IEHiRc8Sw82Pp" 
-               className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
-               alt="Active lifestyle"
-             />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-             <div className="absolute bottom-4 left-4 right-4 text-white/90 font-medium">
-               <span className="block text-[#00e5e5] text-[10px] font-bold uppercase tracking-wider mb-1">Upcoming Event / 即将开始</span>
-               夜市跑 Night Market Run
-               <div className="text-xs opacity-70 font-normal">今晚 Tonight • 8:00 PM</div>
-             </div>
+            <img
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD54VNdHpKbv2mgyWGEv9U-Q0ZVysP9Io9JmHMr-K_xlsZCApFLRbVHIq_OIIEcBw4EX5_qCA2n7YCrnV8t-g3gz2cRnUR4p2nE9fro9GNZ_4_kcGcM0yI7pMSK_NZYdyNgzUwunke_OZfoYv9aArxKCWn3wTVHeUdt2KYdAPpLTYij1_6HsNUiBe_lGOGLLj4odeVtmr35_LykgCfPGwRMuuFYRCY8apqxHQmZGVsD3NHTwEUE1GNLz-_E46acvY_IEHiRc8Sw82Pp"
+              className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
+              alt="Active lifestyle"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white/90 font-medium">
+              <span className="block text-[#00e5e5] text-[10px] font-bold uppercase tracking-wider mb-1">Upcoming Event / 即将开始</span>
+              夜市跑 Night Market Run
+              <div className="text-xs opacity-70 font-normal">今晚 Tonight • 8:00 PM</div>
+            </div>
           </div>
         </div>
 
@@ -47,14 +47,14 @@ const WelcomePage: React.FC = () => {
           <p className="text-white/50 text-base">Join the fun, together.</p>
         </div>
 
-        <button 
+        <button
           onClick={() => navigate('/home')}
           className="group relative w-full flex items-center justify-center gap-3 rounded-xl h-14 bg-[#00e5e5] text-[#0a0715] shadow-[0_0_20px_rgba(0,229,229,0.3)] hover:shadow-[0_0_30px_rgba(0,229,229,0.5)] active:scale-95 transition-all duration-300"
         >
           <span className="text-lg font-bold tracking-wide">立即开始</span>
           <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
-        
+
         <p className="mt-4 text-[10px] text-white/40">
           点击开始即代表同意 <a className="underline hover:text-[#00e5e5]" href="#">用户协议</a> 和 <a className="underline hover:text-[#00e5e5]" href="#">隐私政策</a>
         </p>
