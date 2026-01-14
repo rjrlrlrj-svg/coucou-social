@@ -134,10 +134,33 @@
             </div>
             <div class="flex items-center gap-4">
                 <button
-                    class="bg-primary hover:bg-yellow-500 text-white text-sm font-bold px-5 py-2 rounded-full transition-colors shadow-lg shadow-primary/20"
+                    class="bg-primary hover:bg-yellow-500 text-white text-sm font-bold px-5 py-2 rounded-full transition-colors shadow-lg shadow-primary/20 hidden md:block"
                     onclick="comingSoon(event)">
                     下载 App
                 </button>
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-gray-800 p-2" onclick="toggleMobileMenu()">
+                    <span class="material-symbols-outlined text-3xl">menu</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobileMenu"
+            class="md:hidden absolute top-16 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-xl overflow-hidden max-h-0 transition-[max-height] duration-300 ease-in-out">
+            <div class="flex flex-col p-6 space-y-4 font-bold text-gray-800 text-lg">
+                <a href="#hero" class="py-2 border-b border-gray-50" onclick="toggleMobileMenu()">首页</a>
+                <a href="#features" class="py-2 border-b border-gray-50" onclick="toggleMobileMenu()">功能展示</a>
+                <a href="#" class="py-2 border-b border-gray-50 flex items-center justify-between"
+                    onclick="toggleMobileMenu(); showFeedback(event)">
+                    反馈
+                    <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">New</span>
+                </a>
+                <a href="#" class="py-2 border-b border-gray-50" onclick="toggleMobileMenu(); showAbout(event)">关于我们</a>
+                <a href="app.html"
+                    class="py-3 mt-2 text-center bg-primary text-white rounded-xl shadow-lg shadow-primary/20">
+                    立即体验 App
+                </a>
             </div>
         </div>
     </nav>
@@ -216,7 +239,7 @@
                     </a>
                     <button
                         class="h-16 w-16 border-2 border-gray-200 rounded-2xl flex items-center justify-center hover:border-black hover:bg-gray-50 transition-colors"
-                        onclick="comingSoon(event)">
+                        onclick="shareCurrentPage(this)">
                         <span class="material-symbols-outlined">share</span>
                     </button>
                 </div>
@@ -259,11 +282,6 @@
                 onclick="handleSecretAdmin(this)">
                 &copy; 2026 CouCou Inc. All rights reserved.
             </div>
-            <!-- Debug Button: Removed after testing -->
-            <button onclick="showAdminStats()"
-                class="mt-4 text-[10px] text-gray-200 bg-gray-600 px-2 py-1 rounded opacity-50 hover:opacity-100">
-                🔧 管理员入口 (测试用)
-            </button>
         </div>
     </footer>
 
@@ -295,6 +313,35 @@
             "assets/images/coucou_detail_ui.png",
             "assets/images/coucou_profile_ui.png"
         ];
+
+        // 分享功能
+        function shareCurrentPage(btn) {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                // Visual feedback
+                const icon = btn.querySelector('.material-symbols-outlined');
+                const originalText = icon.innerText;
+
+                icon.innerText = 'check'; // Change to checkmark
+                btn.classList.add('bg-green-50', 'border-green-500', 'text-green-600');
+
+                // Show toast
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-6 py-3 rounded-xl font-medium shadow-2xl z-[100] animate-bounce';
+                toast.innerText = '🔗 链接已复制，快去分享吧！';
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.remove();
+                    // Revert button
+                    icon.innerText = originalText;
+                    btn.classList.remove('bg-green-50', 'border-green-500', 'text-green-600');
+                }, 2000);
+            }).catch(err => {
+                console.error('Share failed', err);
+                alert('复制失败，请手动复制浏览器地址');
+            });
+        }
 
         // 界面切换功能
         function switchUI(index, btn) {
@@ -519,6 +566,17 @@
             if (tapCount >= 5) {
                 showAdminStats();
                 tapCount = 0;
+            }
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            // Toggle logic using max-height for smooth transition
+            if (menu.style.maxHeight) {
+                menu.style.maxHeight = null;
+            } else {
+                menu.style.maxHeight = menu.scrollHeight + "px";
             }
         }
     </script>
