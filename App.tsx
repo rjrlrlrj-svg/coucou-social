@@ -51,7 +51,11 @@ const AppContent: React.FC = () => {
     // 组件挂载时检查数据库连接状态
     import('./services/supabase.ts').then(({ verifyConnection }) => {
       verifyConnection().then(ok => {
-        setConnectionError(!ok);
+        if (!ok) {
+          console.warn('Supabase connection failed. Running in Demo Mode.');
+        }
+        // Force success to avoid blocking UI for prototype demo
+        setConnectionError(false);
         setIsCheckingConnection(false);
       });
     });
