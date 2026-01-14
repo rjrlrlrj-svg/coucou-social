@@ -10,7 +10,7 @@ const WelcomePage: React.FC = () => {
       {/* Background Image Overlay */}
       <div
         className="absolute inset-0 z-0 bg-cover bg-center brightness-50 opacity-60"
-        style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCsxT2fyyB7FLmUAJKaVT--aEBU9MApzmUplTvgjhKVw3VnWDNfeZdvnHK5yknUVSWelUeCDMcN1OKYbrg19gsTGHvOh2HUFw-hiRYYqc2CERQEN0IaV2dpEEV_nLojPQ6ezWWzozpxmAbs99BV-dRwe1uUahK0FYGoehztntrotUwATgj0Wxvh6nvXHB8ZuTV4SEIU_rEKoGadDdVTfhzOvoFtWiYHy9NMjQ2tMjedTJR2CL6G1IBo7mcbMym5Jff5dpXk1oAVD1cy')` }}
+        style={{ backgroundImage: `url('/assets/images/coucou_home_ui.png')` }}
       />
       <div className="absolute inset-0 z-1 w-full h-full bg-gradient-to-b from-[#1e003c80] to-[#0a0014e6] mix-blend-hard-light" />
 
@@ -26,7 +26,7 @@ const WelcomePage: React.FC = () => {
         <div className="mb-8">
           <div className="relative w-64 h-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
             <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD54VNdHpKbv2mgyWGEv9U-Q0ZVysP9Io9JmHMr-K_xlsZCApFLRbVHIq_OIIEcBw4EX5_qCA2n7YCrnV8t-g3gz2cRnUR4p2nE9fro9GNZ_4_kcGcM0yI7pMSK_NZYdyNgzUwunke_OZfoYv9aArxKCWn3wTVHeUdt2KYdAPpLTYij1_6HsNUiBe_lGOGLLj4odeVtmr35_LykgCfPGwRMuuFYRCY8apqxHQmZGVsD3NHTwEUE1GNLz-_E46acvY_IEHiRc8Sw82Pp"
+              src="/assets/images/coucou_home_ui.png"
               className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
               alt="Active lifestyle"
             />
